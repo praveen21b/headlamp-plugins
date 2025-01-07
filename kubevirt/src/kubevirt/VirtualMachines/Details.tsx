@@ -5,7 +5,7 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import Terminal from '../Terminal/Terminal'
+import Terminal from '../Terminal/Terminal';
 import VirtualMachine from './VirtualMachine';
 
 export interface VirtualMachineDetailsProps {
@@ -81,19 +81,19 @@ export default function VirtualMachineDetails(props: VirtualMachineDetailsProps)
             id: 'status',
             section: <Resource.ConditionsSection resource={item?.jsonData} />,
           },
-                    {
-                      id: 'headlamp.vm-terminal',
-                      section: (
-                                    <Terminal
-                                      open={showTerminal}
-                                      key="terminal"
-                                      item={item}
-                                      onClose={() => {
-                                        setShowTerminal(false);
-                                      }}
-                                    />
-                                  ),
-                    },
+          {
+            id: 'headlamp.vm-terminal',
+            section: (
+              <Terminal
+                open={showTerminal}
+                key="terminal"
+                item={item}
+                onClose={() => {
+                  setShowTerminal(false);
+                }}
+              />
+            ),
+          },
         ]
       }
       actions={item =>

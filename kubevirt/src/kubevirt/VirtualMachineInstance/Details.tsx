@@ -1,4 +1,4 @@
-import { ActionButton,Link, Resource } from '@kinvolk/headlamp-plugin/lib/components/common';
+import { ActionButton, Link, Resource } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';

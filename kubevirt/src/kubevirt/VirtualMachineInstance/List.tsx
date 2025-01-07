@@ -95,7 +95,7 @@ export function PodListRenderer(props: PodListProps) {
         'age',
       ]}
       data={virtualMachine}
-      reflectInURL={true}
+      reflectInURL
       id="headlamp-virtualmachines"
     />
   );

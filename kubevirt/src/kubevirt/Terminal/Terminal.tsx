@@ -27,9 +27,9 @@ interface TerminalProps extends DialogProps {
 
 interface ConsoleObject extends KubeObject {
   exec(
-      onExec: StreamResultsCb,
-      options: StreamArgs
-    ): { cancel: () => void; getSocket: () => WebSocket } 
+    onExec: StreamResultsCb,
+    options: StreamArgs
+  ): { cancel: () => void; getSocket: () => WebSocket };
 }
 
 interface XTerminalConnected {

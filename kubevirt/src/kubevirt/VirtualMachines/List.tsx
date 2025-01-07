@@ -91,18 +91,18 @@ export function PodListRenderer(props: PodListProps) {
             ),
           show: false,
         },
-    
+
         'age',
       ]}
       data={virtualMachine}
-      reflectInURL={true}
+      reflectInURL
       id="headlamp-virtualmachines"
     />
   );
 }
 
 export default function PodList() {
-  const { items, error, clusterErrors } = VirtualMachine.useList({})
+  const { items, error, clusterErrors } = VirtualMachine.useList({});
   return (
     <PodListRenderer
       virtualMachine={items}

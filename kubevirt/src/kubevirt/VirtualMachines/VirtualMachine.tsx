@@ -1,5 +1,5 @@
-import { KubeObject } from '@kinvolk/headlamp-plugin/lib/K8s/cluster';
 import { StreamArgs, StreamResultsCb } from '@kinvolk/headlamp-plugin/lib/ApiProxy';
+import { KubeObject } from '@kinvolk/headlamp-plugin/lib/K8s/cluster';
 import VirtualMachineInstance from '../VirtualMachineInstance/VirtualMachineInstance';
 
 class VirtualMachine extends KubeObject {
@@ -31,14 +31,13 @@ class VirtualMachine extends KubeObject {
     );
   }
 
-    exec(
-      onExec: StreamResultsCb,
-      options: StreamArgs
-    ): { cancel: () => void; getSocket: () => WebSocket } {
-      const instance = new VirtualMachineInstance(this.jsonData)
-      return instance.exec(onExec, options)
-      
-    }
+  exec(
+    onExec: StreamResultsCb,
+    options: StreamArgs
+  ): { cancel: () => void; getSocket: () => WebSocket } {
+    const instance = new VirtualMachineInstance(this.jsonData);
+    return instance.exec(onExec, options);
+  }
 
   static kind = 'VirtualMachine';
   static apiVersion = 'kubevirt.io/v1';
