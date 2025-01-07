@@ -1,7 +1,7 @@
 {
-  "name": "headlamp-kubevirt",
-  "version": "0.0.1",
-  "description": "kubevirt",
+  "name": "kubevirt",
+  "version": "v0.0.1-beta1",
+  "description": "A plugin for managing KubeVirt virtual machines within a Kubernetes cluster.",
   "scripts": {
     "start": "headlamp-plugin start",
     "build": "headlamp-plugin build",
@@ -31,7 +31,8 @@
     ]
   },
   "devDependencies": {
+    "@headlamp-k8s/eslint-config": "^0.7.0",
     "@kinvolk/headlamp-plugin": "^0.10.0",
-    "@headlamp-k8s/eslint-config": "^0.7.0"
+    "eslint": "^8.57.1"
   }
 }

@@ -21,9 +21,12 @@ jobs:
       - id: dirs
         run: echo "dirs=$(grep -m1 -lR @kinvolk/headlamp-plugin ./*/package.json | xargs -n1 dirname | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
 
+
   build:
     needs: find_plugin_dirs
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     defaults:
       run:
@@ -47,3 +50,17 @@ jobs:
           npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION build ${{ matrix.dir }}
           npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION test ${{ matrix.dir }}
           npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION tsc ${{ matrix.dir }}
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION package ${{ matrix.dir }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        if: github.ref == 'refs/heads/main'
+        run: |    
+          name=$(jq -r .name ${{ matrix.dir }}/package.json)
+          version=$(jq -r .version ${{ matrix.dir }}/package.json)
+          tag_name="${name}-${version}"
+          if ! git rev-parse "$tag_name" >/dev/null 2>&1; then
+            ls -l ${{ matrix.dir }}/dist
+            gh release create --generate-notes "$tag_name" ${tag_name}.tar.gz --title "Release $tag_name" --notes "Release $tag_name"
+          fi
+
+          

@@ -1,15 +1,16 @@
 import '@xterm/xterm/css/xterm.css';
-import { StreamResultsCb } from '@kinvolk/headlamp-plugin/lib/ApiProxy';
+import { StreamArgs, StreamResultsCb } from '@kinvolk/headlamp-plugin/lib/ApiProxy';
 import { Dialog } from '@kinvolk/headlamp-plugin/lib/CommonComponents';
+import { KubeObject } from '@kinvolk/headlamp-plugin/lib/K8s/cluster';
 import type { DialogProps } from '@mui/material';
 import { Box } from '@mui/material';
 import DialogContent from '@mui/material/DialogContent';
 import { FitAddon } from '@xterm/addon-fit';
 import { Terminal as XTerminal } from '@xterm/xterm';
-import _ from 'lodash';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import VirtualMachineInstance from '../VirtualMachineInstance/VirtualMachineInstance';
+
 enum Channel {
   StdIn = 0,
   StdOut,
@@ -21,6 +22,14 @@ enum Channel {
 interface TerminalProps extends DialogProps {
   item: VirtualMachineInstance;
   onClose?: () => void;
+  open: boolean;
+}
+
+interface ConsoleObject extends KubeObject {
+  exec(
+      onExec: StreamResultsCb,
+      options: StreamArgs
+    ): { cancel: () => void; getSocket: () => WebSocket } 
 }
 
 interface XTerminalConnected {
@@ -28,12 +37,10 @@ interface XTerminalConnected {
   connected: boolean;
   reconnectOnEnter: boolean;
 }
-type execReturn = ReturnType<VirtualMachineInstance['exec']>;
+type execReturn = ReturnType<ConsoleObject['exec']>;
 
 export default function Terminal(props: TerminalProps) {
   const { item, onClose, ...other } = props;
-  //const [terminalContainerRef, setTerminalContainerRef] = useState<HTMLElement | null>(null);
-  //needed ?
   const execRef = useRef<execReturn | null>(null);
   const fitAddonRef = useRef<FitAddon | null>(null);
   const xtermRef = useRef<XTerminalConnected | null>(null);
@@ -115,21 +122,6 @@ export default function Terminal(props: TerminalProps) {
     console.log(bytes);
     xterm.write(text);
   }
-  function isSuccessfulExitError(channel: number, text: string): boolean {
-    // Linux container Error
-    if (channel === 3) {
-      try {
-        const error = JSON.parse(text);
-        if (_.isEmpty(error.metadata) && error.status === 'Success') {
-          return true;
-        }
-      } catch {}
-    }
-    return false;
-  }
-  // function shellConnectFailed(xtermc: XTerminalConnected) {
-  //   xterm.write(t('Failed to connect…') + '\r\n');
-  // }
   useEffect(
     () => {
       console.log('useEffect');

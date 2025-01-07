@@ -12,23 +12,22 @@ import { Resource } from '@kinvolk/headlamp-plugin/lib/components/common';
 import { ApiError } from '@kinvolk/headlamp-plugin/lib/lib/k8s/apiProxy';
 //import { Box } from '@mui/material';
 //import { useTranslation } from 'react-i18next';
-import VirtualMachineInstance from './VirtualMachineInstance';
+import VirtualMachine from './VirtualMachine';
 
 export interface PodListProps {
-  virtualMachine: VirtualMachineInstance[] | null;
+  virtualMachine: VirtualMachine[] | null;
   error: ApiError | null;
   hideColumns?: ['namespace'];
   reflectTableInURL?: SimpleTableProps['reflectInURL'];
   noNamespaceFilter?: boolean;
-  clusterErrors?: ResourceTableProps<VirtualMachineInstance>['clusterErrors'];
+  clusterErrors?: ResourceTableProps<VirtualMachine>['clusterErrors'];
 }
 
 export function PodListRenderer(props: PodListProps) {
   const { virtualMachine, error, hideColumns = [], noNamespaceFilter } = props;
-  //const { t } = useTranslation(['glossary', 'translation']);
   return (
     <Resource.ResourceListView
-      title={'Virtual Machines Instances'}
+      title={'Virtual Machines'}
       headerProps={{
         noNamespaceFilter,
       }}
@@ -41,7 +40,7 @@ export function PodListRenderer(props: PodListProps) {
           getValue: virtualMachine => virtualMachine.getName(),
           render: virtualMachine => (
             <Link
-              routeName="/kubevirt/virtualmachinesinstances/:namespace/:name"
+              routeName="/kubevirt/virtualmachines/:namespace/:name"
               params={{ name: virtualMachine.getName(), namespace: virtualMachine.getNamespace() }}
             >
               {virtualMachine.getName()}
@@ -92,6 +91,7 @@ export function PodListRenderer(props: PodListProps) {
             ),
           show: false,
         },
+    
         'age',
       ]}
       data={virtualMachine}
@@ -101,8 +101,8 @@ export function PodListRenderer(props: PodListProps) {
   );
 }
 
-export default function VirtualMachineInstanceList() {
-  const { items, error, clusterErrors } = VirtualMachineInstance.useList({});
+export default function PodList() {
+  const { items, error, clusterErrors } = VirtualMachine.useList({})
   return (
     <PodListRenderer
       virtualMachine={items}
