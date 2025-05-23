@@ -18,7 +18,7 @@ Before headlamp installation, update your manifest files or Helm values with the
 After applying the deployment changes, access Headlamp.
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/praveen21b/headlamp-plugins/bf/video-render/kubevirt/demo/demo-kubevirt-plugin.gif" width="80%">
+  <img src="https://raw.githubusercontent.com/buttahtoast/headlamp-plugins/bf/video-render/kubevirt/demo/demo-kubevirt-plugin.gif" width="80%">
 </div>
 
 ## 🙋 Contact
