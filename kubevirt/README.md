@@ -22,5 +22,5 @@ After applying the deployment changes, access Headlamp.
   Your browser does not support the video tag.
 </video>
 
-## Contact
+## 🙋 Contact
 For any questions or feedback, please open an issue on the GitHub repository.
