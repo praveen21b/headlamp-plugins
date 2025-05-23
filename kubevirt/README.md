@@ -17,10 +17,9 @@ Before headlamp installation, update your manifest files or Helm values with the
 
 After applying the deployment changes, access Headlamp.
 
-<video width="640" height="360" controls>
-  <source src="./demo/Demo_KubeVirt_Plugin.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<div align="center">
+  <img src="https://raw.githubusercontent.com/praveen21b/headlamp-plugins/bf/video-render/kubevirt/demo/demo-kubevirt-plugin.gif" width="80%">
+</div>
 
 ## 🙋 Contact
 For any questions or feedback, please open an issue on the GitHub repository.
