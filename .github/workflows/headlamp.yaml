@@ -21,35 +21,35 @@ jobs:
       - id: dirs
         run: echo "dirs=$(grep -m1 -lR @kinvolk/headlamp-plugin ./*/package.json | xargs -n1 dirname | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
 
-  # build:
-  #   needs: find_plugin_dirs
-  #   runs-on: ubuntu-latest
-  #   permissions:
-  #     contents: write
+  build:
+    needs: find_plugin_dirs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
-  #   defaults:
-  #     run:
-  #       working-directory: ./
+    defaults:
+      run:
+        working-directory: ./
 
-  #   strategy:
-  #     matrix:
-  #       node-version: [18.x]
-  #       dir: ${{ fromJson(needs.find_plugin_dirs.outputs.dirs) }}
+    strategy:
+      matrix:
+        node-version: [18.x]
+        dir: ${{ fromJson(needs.find_plugin_dirs.outputs.dirs) }}
 
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Use Node.js ${{ matrix.node-version }}
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: ${{ matrix.node-version }}
-  #     - run: |
-  #         echo "Checking ${{ matrix.dir }} plugin"
-  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION format --check ${{ matrix.dir }}
-  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION lint ${{ matrix.dir }}
-  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION build ${{ matrix.dir }}
-  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION test ${{ matrix.dir }}
-  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION tsc ${{ matrix.dir }}
-  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION package ${{ matrix.dir }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: |
+          echo "Checking ${{ matrix.dir }} plugin"
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION format --check ${{ matrix.dir }}
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION lint ${{ matrix.dir }}
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION build ${{ matrix.dir }}
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION test ${{ matrix.dir }}
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION tsc ${{ matrix.dir }}
+          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION package ${{ matrix.dir }}
   #     - env:
   #         GH_TOKEN: ${{ github.token }}
   #       if: github.ref == 'refs/heads/main'
