@@ -19,6 +19,7 @@ jobs:
           node-version: '18'
 
       - name: Install dependencies
+        working-directory: ./kubevirt
         run: npm ci
 
       - name: Run tests
