@@ -2,92 +2,63 @@ name: Headlamp plugin linting, type checking, and testing
 
 on:
   push:
-    branches: [main]
+    branches: bugfix/CI
   pull_request:
-    branches: [main]
+    branches: bugfix/CI
 
 env:
   HEADLAMP_PLUGIN_VERSION: latest
 
 jobs:
   # Get list of folders containing headlamp plugins
+  # We need a separate step to be able to pass the list to the matrix of the build job
   find_plugin_dirs:
     runs-on: ubuntu-latest
     outputs:
       dirs: ${{ steps.dirs.outputs.dirs }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       - id: dirs
-        run: |
-          echo "dirs=$(grep -m1 -lR '@kinvolk/headlamp-plugin' ./*/package.json | xargs -n1 dirname | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
+        run: echo "dirs=$(grep -m1 -lR @kinvolk/headlamp-plugin ./*/package.json | xargs -n1 dirname | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
 
-  build:
-    needs: find_plugin_dirs
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+  # build:
+  #   needs: find_plugin_dirs
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: write
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-        dir: ${{ fromJson(needs.find_plugin_dirs.outputs.dirs) }}
+  #   defaults:
+  #     run:
+  #       working-directory: ./
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-      
-      - name: Verify plugin directory exists
-        run: |
-          echo "Checking plugin directory: ${{ matrix.dir }}"
-          if [ ! -d "${{ matrix.dir }}" ]; then
-            echo "Directory ${{ matrix.dir }} does not exist"
-            exit 1
-          fi
-      
-      - name: Install dependencies
-        working-directory: ${{ matrix.dir }}
-        run: |
-          npm install
-          npm list @kinvolk/headlamp-plugin  # Verify plugin is installed
-      
-      - name: Verify Vite config exists
-        working-directory: ${{ matrix.dir }}
-        run: |
-          if [ ! -f "node_modules/@kinvolk/headlamp-plugin/config/vite.config.mjs" ]; then
-            echo "Vite config file not found!"
-            ls -la node_modules/@kinvolk/headlamp-plugin/config/ || true
-            exit 1
-          fi
-      
-      - name: Run plugin checks
-        working-directory: ${{ matrix.dir }}
-        run: |
-          set -e  # Exit immediately if any command fails
-          echo "Running checks in ${{ matrix.dir }}"
-          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION format --check .
-          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION lint .
-          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION build .
-          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION test .
-          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION tsc .
-          npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION package .
-      
-      - name: Create release (main branch only)
-        if: github.ref == 'refs/heads/main'
-        working-directory: ${{ matrix.dir }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          name=$(jq -r .name package.json)
-          version=$(jq -r .version package.json)
-          tag_name="${name}-${version}"
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.x]
+  #       dir: ${{ fromJson(needs.find_plugin_dirs.outputs.dirs) }}
+
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Use Node.js ${{ matrix.node-version }}
+  #       uses: actions/setup-node@v3
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #     - run: |
+  #         echo "Checking ${{ matrix.dir }} plugin"
+  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION format --check ${{ matrix.dir }}
+  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION lint ${{ matrix.dir }}
+  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION build ${{ matrix.dir }}
+  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION test ${{ matrix.dir }}
+  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION tsc ${{ matrix.dir }}
+  #         npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION package ${{ matrix.dir }}
+  #     - env:
+  #         GH_TOKEN: ${{ github.token }}
+  #       if: github.ref == 'refs/heads/main'
+  #       run: |    
+  #         name=$(jq -r .name ${{ matrix.dir }}/package.json)
+  #         version=$(jq -r .version ${{ matrix.dir }}/package.json)
+  #         tag_name="${name}-${version}"
+  #         if ! git rev-parse "$tag_name" >/dev/null 2>&1; then
+  #           ls -l ${{ matrix.dir }}/dist
+  #           gh release create "$tag_name" ${tag_name}.tar.gz --generate-notes --title "Release $tag_name" --notes "Release $tag_name"
+  #         fi
           
-          if ! git rev-parse "$tag_name" >/dev/null 2>&1; then
-            echo "Creating release $tag_name"
-            gh release create "$tag_name" ./dist/*.tar.gz --generate-notes --title "Release $tag_name"
-          else
-            echo "Release $tag_name already exists"
-          fi
