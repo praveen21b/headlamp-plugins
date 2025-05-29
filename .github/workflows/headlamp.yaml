@@ -10,16 +10,15 @@ env:
   HEADLAMP_PLUGIN_VERSION: latest
 
 jobs:
-  # Get list of folders containing headlamp plugins
-  # We need a separate step to be able to pass the list to the matrix of the build job
   find_plugin_dirs:
     runs-on: ubuntu-latest
     outputs:
       dirs: ${{ steps.dirs.outputs.dirs }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - id: dirs
-        run: echo "dirs=$(grep -m1 -lR @kinvolk/headlamp-plugin ./*/package.json | xargs -n1 dirname | jq --raw-input --slurp --compact-output 'split("\n")[:-1]')" >> ${GITHUB_OUTPUT}
+        run: |
+          echo "dirs=$(grep -m1 -lR @kinvolk/headlamp-plugin ./*/package.json | xargs -n1 dirname | jq --raw-input --slurp --compact-output 'split(\"\n\")[:-1]')" >> $GITHUB_OUTPUT
 
   build:
     needs: find_plugin_dirs
@@ -62,6 +61,7 @@ jobs:
           npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION test ${{ matrix.dir }}
           npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION tsc ${{ matrix.dir }}
           npx @kinvolk/headlamp-plugin@$HEADLAMP_PLUGIN_VERSION package ${{ matrix.dir }}
+
 
   #     - env:
   #         GH_TOKEN: ${{ github.token }}
